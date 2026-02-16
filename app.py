@@ -2,18 +2,18 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# ==============================
+# =====================================
 # CONFIG
-# ==============================
+# =====================================
 
 SHEET_ID = "1YZW1ENJdB1n910lvtCilbG776d0HrudGV163XZzsQqA"
 SHEET_URL = f"https://docs.google.com/spreadsheets/d/1YZW1ENJdB1n910lvtCilbG776d0HrudGV163XZzsQqA/export?format=csv"
 
 st.set_page_config(layout="wide")
 
-# ==============================
+# =====================================
 # DATA LOAD
-# ==============================
+# =====================================
 
 @st.cache_data(ttl=30)
 def load_data():
@@ -24,24 +24,24 @@ def load_data():
 
 df = load_data()
 
-# ==============================
+# =====================================
 # KPI CALCULATIONS
-# ==============================
+# =====================================
 
 total_revenue = df["total_revenue"].sum()
 total_orders = df["order_id"].nunique()
 avg_rating = df["rating"].mean()
 total_quantity = df["quantity_sold"].sum()
 
-# ==============================
+# =====================================
 # TITLE
-# ==============================
+# =====================================
 
-st.title("📊 Sales Performance Dashboard")
+st.title("🌍 Global Sales Dashboard")
 
-# ==============================
+# =====================================
 # KPI ROW
-# ==============================
+# =====================================
 
 col1, col2, col3, col4 = st.columns(4)
 
@@ -52,9 +52,9 @@ col4.metric("🛒 Quantity Sold", f"{total_quantity:,}")
 
 st.markdown("---")
 
-# ==============================
+# =====================================
 # FILTERS
-# ==============================
+# =====================================
 
 colf1, colf2 = st.columns(2)
 
@@ -77,9 +77,69 @@ filtered_df = df[
     (df["customer_region"].isin(selected_region))
 ]
 
-# ==============================
+# =====================================
+# 🌍 WORLD MAP WITH LEGEND
+# =====================================
+
+st.subheader("Orders by Continent")
+
+orders_by_region = (
+    filtered_df.groupby("customer_region")
+    .agg(
+        orders=("order_id", "nunique"),
+        revenue=("total_revenue", "sum")
+    )
+    .reset_index()
+)
+
+# Mapping continent -> representative ISO code
+continent_iso_map = {
+    "North America": "USA",
+    "South America": "BRA",
+    "Europe": "DEU",
+    "Asia": "CHN",
+    "Africa": "ZAF",
+    "Australia": "AUS",
+    "Middle East": "SAU"
+}
+
+orders_by_region["iso"] = orders_by_region["customer_region"].map(continent_iso_map)
+
+fig_map = px.choropleth(
+    orders_by_region,
+    locations="iso",
+    locationmode="ISO-3",
+    color="orders",
+    hover_name="customer_region",
+    hover_data={
+        "orders": True,
+        "revenue": ":,.2f",
+        "iso": False
+    },
+    color_continuous_scale="Tealgrn",
+    title="Number of Orders per Continent"
+)
+
+fig_map.update_layout(
+    geo=dict(
+        showframe=False,
+        showcoastlines=True,
+        projection_type="natural earth"
+    ),
+    coloraxis_colorbar=dict(
+        title="Orders",
+        ticks="outside"
+    ),
+    margin=dict(l=0, r=0, t=50, b=0)
+)
+
+st.plotly_chart(fig_map, use_container_width=True)
+
+st.markdown("---")
+
+# =====================================
 # REVENUE TREND
-# ==============================
+# =====================================
 
 st.subheader("Revenue Trend")
 
@@ -99,58 +159,9 @@ fig_trend = px.line(
 
 st.plotly_chart(fig_trend, use_container_width=True)
 
-# ==============================
-# CONTINENT WORLD MAP
-# ==============================
-
-st.subheader("🌍 Orders by Continent")
-
-# Orders per continent
-orders_by_region = (
-    filtered_df.groupby("customer_region")["order_id"]
-    .nunique()
-    .reset_index()
-)
-
-orders_by_region.columns = ["region", "orders"]
-
-# Mapping continenten naar ISO-3 codes
-continent_iso_map = {
-    "North America": "USA",
-    "South America": "BRA",
-    "Europe": "FRA",
-    "Asia": "CHN",
-    "Africa": "ZAF",
-    "Australia": "AUS",
-    "Middle East": "SAU"
-}
-
-orders_by_region["iso"] = orders_by_region["region"].map(continent_iso_map)
-
-fig_map = px.choropleth(
-    orders_by_region,
-    locations="iso",
-    locationmode="ISO-3",
-    color="orders",
-    hover_name="region",
-    color_continuous_scale="Blues",
-    title="Number of Orders per Continent"
-)
-
-fig_map.update_layout(
-    geo=dict(
-        showframe=False,
-        showcoastlines=True,
-        projection_type="natural earth"
-    ),
-    margin=dict(l=0, r=0, t=50, b=0)
-)
-
-st.plotly_chart(fig_map, use_container_width=True)
-
-# ==============================
+# =====================================
 # CATEGORY & REGION BARS
-# ==============================
+# =====================================
 
 col5, col6 = st.columns(2)
 
@@ -188,9 +199,9 @@ with col6:
 
     st.plotly_chart(fig_region, use_container_width=True)
 
-# ==============================
+# =====================================
 # PAYMENT METHOD PIE
-# ==============================
+# =====================================
 
 st.subheader("Payment Method Distribution")
 
@@ -210,4 +221,5 @@ fig_payment = px.pie(
 )
 
 st.plotly_chart(fig_payment, use_container_width=True)
+
 
