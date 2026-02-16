@@ -7,7 +7,7 @@ import plotly.express as px
 # ==============================
 
 SHEET_ID = "1YZW1ENJdB1n910lvtCilbG776d0HrudGV163XZzsQqA"
-SHEET_URL = f"https://docs.google.com/spreadsheets/d/1YZW1ENJdB1n910lvtCilbG776d0HrudGV163XZzsQqA/edit?usp=sharing"
+SHEET_URL = f"https://docs.google.com/spreadsheets/d/1YZW1ENJdB1n910lvtCilbG776d0HrudGV163XZzsQqA/export?format=csv"
 
 st.set_page_config(layout="wide")
 
