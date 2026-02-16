@@ -34,7 +34,7 @@ avg_rating = df["rating"].mean()
 total_quantity = df["quantity_sold"].sum()
 
 # ==============================
-# DASHBOARD TITLE
+# TITLE
 # ==============================
 
 st.title("📊 Sales Performance Dashboard")
@@ -100,7 +100,56 @@ fig_trend = px.line(
 st.plotly_chart(fig_trend, use_container_width=True)
 
 # ==============================
-# CATEGORY & REGION CHARTS
+# CONTINENT WORLD MAP
+# ==============================
+
+st.subheader("🌍 Orders by Continent")
+
+# Orders per continent
+orders_by_region = (
+    filtered_df.groupby("customer_region")["order_id"]
+    .nunique()
+    .reset_index()
+)
+
+orders_by_region.columns = ["region", "orders"]
+
+# Mapping continenten naar ISO-3 codes
+continent_iso_map = {
+    "North America": "USA",
+    "South America": "BRA",
+    "Europe": "FRA",
+    "Asia": "CHN",
+    "Africa": "ZAF",
+    "Australia": "AUS",
+    "Middle East": "SAU"
+}
+
+orders_by_region["iso"] = orders_by_region["region"].map(continent_iso_map)
+
+fig_map = px.choropleth(
+    orders_by_region,
+    locations="iso",
+    locationmode="ISO-3",
+    color="orders",
+    hover_name="region",
+    color_continuous_scale="Blues",
+    title="Number of Orders per Continent"
+)
+
+fig_map.update_layout(
+    geo=dict(
+        showframe=False,
+        showcoastlines=True,
+        projection_type="natural earth"
+    ),
+    margin=dict(l=0, r=0, t=50, b=0)
+)
+
+st.plotly_chart(fig_map, use_container_width=True)
+
+# ==============================
+# CATEGORY & REGION BARS
 # ==============================
 
 col5, col6 = st.columns(2)
@@ -161,3 +210,4 @@ fig_payment = px.pie(
 )
 
 st.plotly_chart(fig_payment, use_container_width=True)
+
