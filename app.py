@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd
 
-SHEET_ID = "1nhwhp8aFOeMYPwTwDCxT_aQVWkJgjzxS"
-SHEET_URL = f"https://drive.google.com/file/d/1nhwhp8aFOeMYPwTwDCxT_aQVWkJgjzxS/view?usp=sharing"
+SHEET_ID = "1YZW1ENJdB1n910lvtCilbG776d0HrudGV163XZzsQqA"
+SHEET_URL = f"https://docs.google.com/spreadsheets/d/1YZW1ENJdB1n910lvtCilbG776d0HrudGV163XZzsQqA/edit?usp=sharing"
 
 st.title("📊 Live Dashboard")
 
